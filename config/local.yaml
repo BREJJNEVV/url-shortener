@@ -1,0 +1,35 @@
+# #Система должна знать, где она выполняется
+# env: "local" # local, dev, prod
+# #Место, где хранится база данных
+# storage_path: "./storage/storage.db"
+# http_server:
+#   address: "0.0.0.0:8082"
+#   #Время на чтение запроса и такое же время на отправку ответа(обработка unlimited)
+#   timeout: 4s
+#   #Время, которые мы ждём, и если нет второго запроса - мы разрываем соединение
+#   idle_timeout: 60s
+
+
+
+# env: "local"
+# storage_path: "./storage/storage.db"  # добавьте расширение .db
+# http_server:                          # совпадает с тегом yaml:"http_server"
+#   address: "localhost:8082"           # отступ 2 пробела
+#   timeout: 10s                        # отступ 2 пробела
+#   idle_timeout: 60s                   # совпадает с тегом yaml:"idle_timeout"
+#   user: "admin"                       # обязательное поле
+#   password: "qwerty"             
+
+
+env: "local"
+storage_path: "./storage/storage.db"
+http_server:
+  address: "localhost:8082"
+  timeout: 10s
+  idle_timeout: 60s
+  user: "myuser"         
+  password: "mypass"   
+
+
+  # user: "admin"         
+  # password: "qwerty"   
