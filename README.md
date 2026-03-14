@@ -63,7 +63,7 @@ curl -X DELETE -u admin:secret http://localhost:8080/url/custom
 404 Not Found – алиас не найден
 
 ## Структура проекта
-.
+```
 ├── cmd/
 │   └── url-shortener/        # точка входа
 │       └── main.go
@@ -89,4 +89,4 @@ curl -X DELETE -u admin:secret http://localhost:8080/url/custom
 ├── go.mod
 ├── go.sum
 └── README.md
-
+```
