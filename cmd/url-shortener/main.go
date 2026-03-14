@@ -28,6 +28,7 @@ const (
 )
 
 func main() {
+	fmt.Println("start")
 	err := godotenv.Load() // проверка на инициализацию окружения
 	if err != nil {
 		log.Fatalf("Error loading .env filewww")
@@ -69,7 +70,9 @@ func main() {
 		r.Post("/", save.New(log, storage)) //отправляем запрос на сохраниние
 		r.Delete("/{alias}", delete.New(log, storage))
 	})
-
+	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./static/index.html")
+	})
 	router.Get("/{alias}", redirect.New(log, storage)) // первый параметр (alias) говорит нам по какому адрессу мы перейдём
 
 	//storage.DeleteURL("ya2ndex")

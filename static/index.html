@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener — сокращатель ссылок</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 600px;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2em;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 0.95em;
+        }
+
+        .tab-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 1em;
+            color: #666;
+            transition: all 0.3s;
+            border-radius: 8px;
+        }
+
+        .tab:hover {
+            background: #f5f5f5;
+        }
+
+        .tab.active {
+            color: #667eea;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: #667eea;
+            border-radius: 3px 3px 0 0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #5a67d8;
+        }
+
+        button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            background: #f8f9fa;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        .result.success {
+            border-left: 4px solid #48bb78;
+        }
+
+        .result.error {
+            border-left: 4px solid #f56565;
+        }
+
+        .result-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .result-content {
+            word-break: break-all;
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+            font-family: monospace;
+        }
+
+        .result-content a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .result-content a:hover {
+            text-decoration: underline;
+        }
+
+        .helper-text {
+            font-size: 0.85em;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .auth-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .auth-section h3 {
+            color: #555;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .info-box {
+            background: #e8f4fd;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            color: #2c3e50;
+        }
+
+        .info-box strong {
+            color: #667eea;
+        }
+
+        .url-list {
+            margin-top: 30px;
+            border-top: 2px solid #f0f0f0;
+            padding-top: 20px;
+        }
+
+        .url-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .url-item-content {
+            flex: 1;
+        }
+
+        .url-item-alias {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .url-item-original {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 3px;
+            word-break: break-all;
+        }
+
+        .delete-btn {
+            background: #f56565;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.3s;
+        }
+
+        .delete-btn:hover {
+            background: #e53e3e;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔗 URL Shortener</h1>
+        <p class="subtitle">Сокращайте длинные ссылки и делитесь ими легко</p>
+
+        <div class="info-box">
+            <strong>⚡ Для создания и удаления ссылок</strong> требуется авторизация (admin/пароль из .env)
+        </div>
+
+        <div class="tab-container">
+            <button class="tab active" onclick="switchTab('create')">➕ Создать</button>
+            <button class="tab" onclick="switchTab('manage')">🗑️ Управление</button>
+            <button class="tab" onclick="switchTab('about')">ℹ️ О проекте</button>
+        </div>
+
+        <!-- Вкладка: Создание ссылки -->
+        <div id="create-tab" class="tab-content">
+            <div class="auth-section" id="create-auth">
+                <h3>Авторизация</h3>
+                <div class="form-group">
+                    <label>Логин</label>
+                    <input type="text" id="create-username" placeholder="admin">
+                </div>
+                <div class="form-group">
+                    <label>Пароль</label>
+                    <input type="password" id="create-password" placeholder="••••••••">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Длинная ссылка *</label>
+                <input type="text" id="long-url" placeholder="https://example.com/very/long/path?with=query">
+            </div>
+
+            <div class="form-group">
+                <label>Короткий алиас (необязательно)</label>
+                <input type="text" id="custom-alias" placeholder="например: mylink">
+                <div class="helper-text">Если не указать, сгенерируется автоматически</div>
+            </div>
+
+            <button onclick="createShortUrl()">✨ Создать короткую ссылку</button>
+        </div>
+
+        <!-- Вкладка: Управление ссылками -->
+        <div id="manage-tab" class="tab-content" style="display: none;">
+            <div class="auth-section">
+                <h3>Авторизация для удаления</h3>
+                <div class="form-group">
+                    <label>Логин</label>
+                    <input type="text" id="delete-username" placeholder="admin">
+                </div>
+                <div class="form-group">
+                    <label>Пароль</label>
+                    <input type="password" id="delete-password" placeholder="••••••••">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Алиас для удаления</label>
+                <input type="text" id="delete-alias" placeholder="например: mylink">
+            </div>
+
+            <button onclick="deleteUrl()" style="background: #f56565;">🗑️ Удалить ссылку</button>
+
+            <div class="url-list" id="url-list" style="display: none;">
+                <h3>Ваши ссылки</h3>
+                <div id="urls-container"></div>
+            </div>
+        </div>
+
+        <!-- Вкладка: О проекте -->
+        <div id="about-tab" class="tab-content" style="display: none;">
+            <h3>О проекте</h3>
+            <p>Простой сервис для сокращения ссылок, написанный на Go.</p>
+
+            <h4>Технологии:</h4>
+            <ul>
+                <li>Go 1.21+</li>
+                <li>Chi роутер</li>
+                <li>SQLite база данных</li>
+                <li>Basic Auth для защиты</li>
+            </ul>
+
+            <h4>API Endpoints:</h4>
+            <ul>
+                <li><strong>POST /url</strong> - создать ссылку (auth)</li>
+                <li><strong>GET /{alias}</strong> - перейти по ссылке</li>
+                <li><strong>DELETE /url/{alias}</strong> - удалить ссылку (auth)</li>
+            </ul>
+
+            <p>Исходный код доступен на <a href="https://github.com/BREJJNEVV/url-shortener">GitHub</a></p>
+        </div>
+
+        <!-- Результат операции -->
+        <div id="result" class="result">
+            <div class="result-title" id="result-title"></div>
+            <div class="result-content" id="result-content"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin; // или замените на ваш URL: http://localhost:8080
+
+        function switchTab(tabName) {
+            // Обновляем табы
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Показываем нужную вкладку
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            document.getElementById(tabName + '-tab').style.display = 'block';
+
+            // Скрываем результат при переключении
+            document.getElementById('result').classList.remove('show');
+        }
+
+        function showResult(title, content, isSuccess = true) {
+            const resultDiv = document.getElementById('result');
+            const titleDiv = document.getElementById('result-title');
+            const contentDiv = document.getElementById('result-content');
+
+            resultDiv.classList.remove('success', 'error');
+            resultDiv.classList.add(isSuccess ? 'success' : 'error');
+
+            titleDiv.textContent = title;
+
+            if (typeof content === 'string') {
+                contentDiv.innerHTML = content;
+            } else {
+                contentDiv.innerHTML = JSON.stringify(content, null, 2);
+            }
+
+            resultDiv.classList.add('show');
+        }
+
+        async function createShortUrl() {
+            const username = document.getElementById('create-username').value;
+            const password = document.getElementById('create-password').value;
+            const longUrl = document.getElementById('long-url').value;
+            const alias = document.getElementById('custom-alias').value;
+
+            if (!longUrl) {
+                showResult('Ошибка', 'Введите URL для сокращения', false);
+                return;
+            }
+
+            if (!username || !password) {
+                showResult('Ошибка', 'Введите логин и пароль для авторизации', false);
+                return;
+            }
+
+            const auth = btoa(`${username}:${password}`);
+
+            const body = {
+                url: longUrl
+            };
+
+            if (alias) {
+                body.alias = alias;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/url`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Basic ${auth}`
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    const shortUrl = `${API_BASE}/${data.alias}`;
+                    showResult(
+                        '✅ Ссылка создана!',
+                        `<strong>Короткая ссылка:</strong> <a href="${shortUrl}" target="_blank">${shortUrl}</a><br>
+                         <strong>Алиас:</strong> ${data.alias}<br>
+                         <strong>Оригинальный URL:</strong> ${longUrl}`
+                    );
+                } else if (response.status === 409) {
+                    showResult('❌ Ошибка', 'Такой алиас уже существует. Попробуйте другой', false);
+                } else if (response.status === 401) {
+                    showResult('❌ Ошибка', 'Неверный логин или пароль', false);
+                } else {
+                    showResult('❌ Ошибка', data.error || 'Что-то пошло не так', false);
+                }
+            } catch (error) {
+                showResult('❌ Ошибка', 'Не удалось соединиться с сервером', false);
+                console.error(error);
+            }
+        }
+
+        async function deleteUrl() {
+            const username = document.getElementById('delete-username').value;
+            const password = document.getElementById('delete-password').value;
+            const alias = document.getElementById('delete-alias').value;
+
+            if (!alias) {
+                showResult('Ошибка', 'Введите алиас для удаления', false);
+                return;
+            }
+
+            if (!username || !password) {
+                showResult('Ошибка', 'Введите логин и пароль для авторизации', false);
+                return;
+            }
+
+            const auth = btoa(`${username}:${password}`);
+
+            try {
+                const response = await fetch(`${API_BASE}/url/${alias}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Basic ${auth}`
+                    }
+                });
+
+                if (response.ok) {
+                    showResult('✅ Успешно', `Ссылка с алиасом "${alias}" удалена`);
+                    document.getElementById('delete-alias').value = '';
+                } else if (response.status === 401) {
+                    showResult('❌ Ошибка', 'Неверный логин или пароль', false);
+                } else if (response.status === 404) {
+                    showResult('❌ Ошибка', `Алиас "${alias}" не найден`, false);
+                } else {
+                    showResult('❌ Ошибка', 'Что-то пошло не так', false);
+                }
+            } catch (error) {
+                showResult('❌ Ошибка', 'Не удалось соединиться с сервером', false);
+                console.error(error);
+            }
+        }
+
+        // Функция для копирования в буфер обмена
+        window.copyToClipboard = function (text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Ссылка скопирована!');
+            });
+        };
+
+        // Добавляем обработчик Enter в полях ввода
+        document.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                const activeTab = document.querySelector('.tab.active').textContent;
+                if (activeTab.includes('Создать')) {
+                    createShortUrl();
+                } else if (activeTab.includes('Управление')) {
+                    deleteUrl();
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
